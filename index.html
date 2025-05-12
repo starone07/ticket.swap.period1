@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cannes Ticket Swap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .ticket-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column; /* Changed to column layout */
+            align-items: flex-start; /* Align items to the start */
+            justify-content: space-between;
+            border: 1px solid #e0e0e0;
+        }
+        .ticket-info {
+            flex-grow: 1;
+            margin-right: 0; /* Removed right margin */
+            margin-bottom: 8px; /* Added margin below ticket info */
+            width: 100%;
+        }
+        .ticket-name {
+            font-size: 1.1em; /* Reduced font size slightly */
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px; /* Added spacing below ticket name */
+        }
+        .ticket-details {
+            font-size: 0.85em; /* Reduced font size */
+            color: #666;
+        }
+        .have-ticket {
+            background-color: #f0fdf4;
+            border: 1px solid #16a34a;
+            color: #15803d;
+        }
+        .want-ticket {
+            background-color: #fef08a;
+            border: 1px solid #fde047;
+            color: #d97706;
+        }
+        .swap-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 16px; /* Slightly increased vertical padding */
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 0.9em;
+            width: 100%; /* Make button full width */
+            text-align: center; /* Center the text */
+        }
+        .swap-button:hover {
+            background-color: #0056b3;
+        }
+        .disabled-button {
+            background-color: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            pointer-events: none;
+            width: 100%;
+            text-align: center;
+        }
+
+         .alert {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.375rem;
+        }
+        .alert-warning {
+            background-color: #fffbeb;
+            border-color: #fef08a;
+            color: #1e293b;
+        }
+        .alert-success {
+            background-color: #f0fdf4;
+            border-color: #34d399;
+            color: #1e293b;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            font-size: 1rem;
+            color: #374151;
+            outline: none;
+            transition: border-color 0.15s ease-in-out, shadow-sm 0.15s ease-in-out;
+        }
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            font-size: 1rem;
+            color: #374151;
+            outline: none;
+            transition: border-color 0.15s ease-in-out, shadow-sm 0.15s ease-in-out;
+            appearance: none; /* Remove default arrow */
+            background-image: url("data:image/svg+xml,%3Csvgxmlns='http://www.w3.org/2000/svg'viewBox='0 0 20 20'%3E%3Cpathfill='none'stroke='%236b7280'stroke-linecap='round'stroke-linejoin='round'stroke-width='1.5'd='M6 8l4 4 4-4'/%3E%3C/svg%3E"); /* Custom arrow */
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1rem;
+        }
+        .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        .checkbox-input {
+            appearance: none;
+            -webkit-appearance: none;
+            height: 1rem;
+            width: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            background-color: #fff;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+            position: relative; /* To position the checkmark */
+        }
+        .checkbox-input:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        .checkbox-input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .checkbox-input:checked::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            height: 0.5rem;
+            width: 0.3rem;
+            border-bottom: 2px solid #fff;
+            border-left: 2px solid #fff;
+        }
+
+        .checkbox-text {
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-red-600 text-white py-4 shadow-md">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl font-semibold text-center">Cannes Ticket Swap</h1>
+        </div>
+    </header>
+
+    <main class="container mx-auto py-8 px-4">
+        <div id="message-box" class="alert alert-warning hidden" role="alert">
+            <strong class="font-bold">Warning!</strong>
+            <span class="block sm:inline" id="message-text"></span>
+        </div>
+
+        <section id="verification-section" class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Verify Your Email</h2>
+            <p class="text-gray-700 mb-4">Please enter your name and email to continue.</p>
+            <form id="verification-form" class="space-y-4">
+                <div class="form-group">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" id="name" placeholder="Your Name" required class="form-input">
+                    <div id="name-error" class="text-red-500 text-xs italic" style="display: none;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" placeholder="your.email@example.com" required class="form-input">
+                    <div id="email-error" class="text-red-500 text-xs italic" style="display: none;"></div>
+                </div>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Verify Email</button>
+            </form>
+            <div id="verification-code-form" class="space-y-4 mt-4 hidden">
+                <p class="text-gray-700 mb-4">Please enter the verification code sent to your email.</p>
+                <div class="form-group">
+                    <label for="verification-code" class="form-label">Verification Code</label>
+                    <input type="text" id="verification-code" placeholder="123456" required class="form-input">
+                    <div id="verification-code-error" class="text-red-500 text-xs italic" style="display: none;"></div>
+                </div>
+                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Confirm Code</button>
+            </div>
+        </section>
+
+        <section id="ticket-listing" class="bg-white rounded-lg shadow-md p-6 mb-8 hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Available Tickets</h2>
+            <div id="available-tickets" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <p class="text-gray-500 text-center">Loading tickets...</p>
+            </div>
+        </section>
+
+        <section id="my-tickets" class="bg-white rounded-lg shadow-md p-6 mb-8 hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">My Tickets</h2>
+            <div id="my-tickets-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                 <p class="text-gray-500 text-center">Loading your tickets...</p>
+            </div>
+            <div class="mt-4">
+                <button id="add-ticket-button" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add Ticket</button>
+            </div>
+        </section>
+
+        <section id="add-ticket-form" class="bg-white rounded-lg shadow-md p-6 mb-8 hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Add Ticket</h2>
+            <form id="add-ticket-form-fields" class="space-y-4">
+                <div class="form-group">
+                    <label for="ticket-name" class="form-label">Ticket Name</label>
+                    <input type="text" id="ticket-name" placeholder="e.g., Opening Ceremony" required class="form-input">
+                    <div id="ticket-name-error" class="text-red-500 text-xs italic" style="display: none;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="screening-date" class="form-label">Screening Date</label>
+                    <input type="date" id="screening-date" required class="form-input">
+                    <div id="screening-date-error" class="text-red-500 text-xs italic" style="display: none;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="screening-time" class="form-label">Screening Time</label>
+                    <input type="time" id="screening-time" required class="form-input">
+                    <div id="screening-time-error" class="text-red-500 text-xs italic" style="display: none;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="contact-method" class="form-label">Contact Method</label>
+                    <select id="contact-method" required class="form-select">
+                        <option value="">Select Contact Method</option>
+                        <option value="email">Email</option>
+                        <option value="whatsapp">WhatsApp</option>
+                    </select>
+                    <div id="contact-method-error" class="text-red-500 text-xs italic" style="display: none;"></div>
+                </div>
+                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add Ticket</button>
+                <button type="button" id="cancel-add-ticket-button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2">Cancel</button>
+            </form>
+        </section>
+
+        <section id="swap-request-modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                <h2 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                    Swap Request
+                                </h2>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500">
+                                        You are requesting to swap your ticket for: <span id="modal-requested-ticket-name" class="font-semibold"></span>
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        With: <span id="modal-requester-name" class="font-semibold"></span>
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Your Ticket: <span id="modal-my-ticket-name" class="font-semibold"></span>
+                                    </p>
+                                     <div id="modal-phone-option" class="mt-4">
+                                        <label for="share-phone" class="checkbox-label">
+                                            <input type="checkbox" id="share-phone" class="checkbox-input">
+                                            <span class="checkbox-text">Share phone number for faster contact</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="button" id="confirm-swap-button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Confirm Swap
+                        </button>
+                        <button type="button" id="cancel-swap-button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+         <section id="contact-info-modal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                <h2 class="text-lg leading-6 font-medium text-gray-900" id="contact-modal-title">
+                                    Contact Information
+                                </h2>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500">
+                                        Contact: <span id="contact-name" class="font-semibold"></span>
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Contact Method: <span id="contact-method-display" class="font-semibold"></span>
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        Contact Information: <span id="contact-info" class="font-semibold"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="button" id="close-contact-modal-button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let tickets = [];
+        let users = [];
+        let currentUser = null;
+        let swapRequests = [];
+        let verificationCode = '';
+        let userName = '';
+        let userEmail = '';
+
+        function showMessage(message, type = 'warning') {
+            const messageBox = document.getElementById('message-box');
+            const messageText = document.getElementById('message-text');
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden');
+            messageBox.classList.remove('alert-warning', 'alert-success');
+
+            if (type === 'warning') {
+                messageBox.classList.add('alert-warning');
+            } else if (type === 'success') {
+                messageBox.classList.add('alert-success');
+            }
+        }
+
+        function hideMessage() {
+            document.getElementById('message-box').classList.add('hidden');
+        }
+
+        function validateEmail(email) {
+            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+        }
+
+        function validateTicketForm() {
+            let isValid = true;
+            const ticketNameInput = document.getElementById('ticket-name');
+            const screeningDateInput = document.getElementById('screening-date');
+            const screeningTimeInput = document.getElementById('screening-time');
+            const contactMethodInput = document.getElementById('contact-method');
+
+            if (!ticketNameInput.value.trim()) {
+                document.getElementById('ticket-name-error').textContent = "Ticket name is required";
+                document.getElementById('ticket-name-error').style.display = "block";
+                isValid = false;
+            } else {
+                document.getElementById('ticket-name-error').style.display = "none";
+            }
+            if (!screeningDateInput.value) {
+                document.getElementById('screening-date-error').textContent = "Screening date is required";
+                do
