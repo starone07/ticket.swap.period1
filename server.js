@@ -1,5 +1,4 @@
 
-```javascript
 const express = require('express');
 require('dotenv').config(); // You can remove this line if you're not using a .env file
 
@@ -161,18 +160,3 @@ app.listen(PORT, () => {
 
 If you are able to set environment variables, you can create a `.env` file:
 
-```
-PORT=3000
-```
-
-**Explanation**
-
-This version of the code does the following:
-
-1.  Sets up a basic Express.js server.
-2.  Handles user registration, login, ticket adding, and swap requests.
-3.  Stores data in memory (which is OK for testing but NOT for production).
-4.  Logs the swap request details to the console, including the contact information.
-5.  Sends a JSON response to the client indicating that the swap request was accepted.
-
-This version is designed to be as simple as possible to run, especially on a phone using Termux, as it removes the need for an external email service.
