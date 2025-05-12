@@ -158,5 +158,4 @@ app.listen(PORT, () => {
 
 **`.env` (Optional):**
 
-If you are able to set environment variables, you can create a `.env` file:
 
